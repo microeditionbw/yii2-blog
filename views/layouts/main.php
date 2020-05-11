@@ -44,8 +44,11 @@ PublicAsset::register($this);
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-                <ul class="nav navbar-nav text-uppercase">
+                <ul class="nav navbar-nav text-uppercase">  
                     <li><a href="/">Home</a></li>
+                    <? if(Yii::$app->user->identity->isAdmin): ?>
+                        <li><a href="<?= Url::toRoute(['/admin/default/'])?>">Panel</a></li>
+                   <?php endif; ?>
                 </ul>
                 <div class="i_con">
                     <ul class="nav navbar-nav text-uppercase">
