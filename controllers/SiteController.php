@@ -2,13 +2,19 @@
 
 namespace app\controllers;
 
+namespace app\controllers;
+
+use app\models\Article;
+use app\models\Category;
+use app\models\CommentForm;
 use Yii;
+use yii\data\Pagination;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use yii\helpers\ArrayHelper;
 
 class SiteController extends Controller
 {
@@ -61,42 +67,20 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
-    }
+        $data = Article::getAll(1);
+        $popular = Article::getPopular();
+        $recent = Article::getRecent();
+        $categories = Category::getAll();
 
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
+        return $this->render('index', [
+             'articles' => $data['articles'],
+             'pages' => $data['pages'],
+             'popular' => $popular,
+             'recent' => $recent,
+             'categories' => $categories
         ]);
     }
 
-    /**
-     * Logout action.
-     *
-     * @return Response
-     */
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
-    }
 
     /**
      * Displays contact page.
@@ -125,4 +109,67 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    public function actionView($id)
+    {
+        $article = Article::findOne($id);
+        $popular = Article::getPopular();
+        $recent = Article::getRecent();
+        $categories = Category::getAll();
+        $comments = $article->getArticleComments();
+        $commentForm = new CommentForm();
+
+        $article->viewedCounter();
+
+        $tags = ArrayHelper::map($article->tags, 'id', 'title');
+        return $this->render('single', [
+            'article' => $article,
+            'comments'=>$comments,
+            'commentForm'=>$commentForm,
+            'categories' => $categories,
+             'popular' => $popular,
+             'recent' => $recent,
+             'categories' => $categories,
+            'tags'=>$tags,
+        ]);
+    }
+
+    public function actionCategory($id)
+    {
+        $query = Article::find()->where(['category_id'=>$id]);
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize'=>6]);
+        $articles = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+        $popular = Article::getPopular();
+        $recent = Article::getRecent();
+        $categories = Category::getAll();
+        $data['articles'] = $articles;
+        $data['pages'] = $pages;
+
+        return $this->render('category',[
+             'popular' => $popular,
+             'recent' => $recent,
+             'categories' => $categories,
+            'articles' => $data['articles'],
+            'pages' => $data['pages'],
+        ]);
+    }
+
+    public function actionComment($id)
+    {
+        $model = new CommentForm();
+        
+        if(Yii::$app->request->isPost)
+        {
+            $model->load(Yii::$app->request->post());
+            if($model->saveComment($id))
+            {
+                Yii::$app->getSession()->setFlash('comment', 'Your comment will be added soon!');
+                return $this->redirect(['site/view','id'=>$id]);
+            }
+        }
+    }
+
 }

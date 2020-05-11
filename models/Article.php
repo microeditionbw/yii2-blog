@@ -116,6 +116,7 @@ class Article extends \yii\db\ActiveRecord
         return $this->hasMany(Tag::className(), ['id' => 'tag_id'])
             ->viaTable('article_tag', ['article_id' => 'id']);
     }
+
     
     public function getSelectedTags()
     {
@@ -140,4 +141,53 @@ class Article extends \yii\db\ActiveRecord
         ArticleTag::deleteAll(['article_id'=>$this->id]);
     }
 
+    public function getDate()
+    {
+        //Yii::$app->formatter->locale ='ru-RU';
+        return Yii::$app->formatter->asDate($this->date);
+    }
+
+    public static function getAll($pageSize = 5)
+    {
+        $query = Article::find();
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize'=>$pageSize]);
+        $articles = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+
+        $data['articles'] = $articles;
+        $data['pages'] = $pages;
+        return $data;
+    }
+    public static function getPopular()
+    {
+        return Article::find()->orderBy('viewed desc')->limit(3)->all();
+    }
+
+    public static function getRecent()
+    {
+        return Article::find()->orderBy('date asc')->limit(4)->all();
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::className(), ['article_id'=>'id']);
+    }
+
+    public function getArticleComments()
+    {
+        return $this->getComments()->where(['status'=>1])->all();
+    }
+    
+    public function getAuthor()
+    {
+        return $this->hasOne(User::className(), ['id'=>'user_id']);
+    }
+    
+    public function viewedCounter()
+    {
+        $this->viewed += 1;
+        return $this->save(false);
+    }
 }

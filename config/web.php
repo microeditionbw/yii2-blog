@@ -16,31 +16,13 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'D2f[w23Z]_341234f-324fFqgp]',
         ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-        ],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['auth/login']
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
-        ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-            // 'useFileTransport' to false and configure a transport
-            // for the mailer to send real emails.
-            'useFileTransport' => true,
-        ],
-        'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
         ],
         'db' => $db,
         'urlManager' => [
@@ -50,6 +32,16 @@ $config = [
                 ''=>'site/index',
                 '<action>'=>'site/<action>',
             ),
+        ],
+        'assetManager' => [
+            'bundles' => [
+                'yii\web\JqueryAsset' => [
+                    'sourcePath' => null,   // отключение дефолтного jQuery
+                    'js' => [
+                        'public/js/jquery-1.11.3.min.js', // добавление вашей версии
+                    ]
+                ],
+            ],
         ],
     ],
     'modules' => [
