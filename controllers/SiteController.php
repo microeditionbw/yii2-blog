@@ -67,7 +67,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $data = Article::getAll(1);
+        $data = Article::getAll(4);
         $popular = Article::getPopular();
         $recent = Article::getRecent();
         $categories = Category::getAll();
@@ -138,7 +138,7 @@ class SiteController extends Controller
     {
         if($id=="all") {$query = Article::find();}
         else{ $query = Article::find()->where(['category_id'=>$id]); }
-        
+
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize'=>6]);
         $articles = $query->offset($pages->offset)
