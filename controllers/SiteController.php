@@ -136,7 +136,9 @@ class SiteController extends Controller
 
     public function actionCategory($id)
     {
-        $query = Article::find()->where(['category_id'=>$id]);
+        if($id=="all") {$query = Article::find();}
+        else{ $query = Article::find()->where(['category_id'=>$id]); }
+        
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize'=>6]);
         $articles = $query->offset($pages->offset)

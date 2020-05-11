@@ -175,8 +175,14 @@ PublicAsset::register($this);
             </div>
             <div class="col-md-4">
                 <aside class="footer-widget">
-                    <h3 class="widget-title text-uppercase">Custom Category Post</h3>
-
+                    <h3 class="widget-title text-uppercase">Other Category Post</h3>
+<?php
+        $random_array = app\models\Article::find()->select("id")->asArray()->column();
+        $random_i = array_rand($random_array);
+        $random_v = $random_array[$random_i];
+        $random_article = app\models\Article::find()->where(['id'=>$random_v]);
+        var_dump($random_article);
+?>
 
                     <div class="custom-post">
                         <div>

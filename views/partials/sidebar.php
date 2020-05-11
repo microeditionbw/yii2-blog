@@ -44,6 +44,9 @@
                                 <span class="post-count pull-right"> (<?= $category->getArticles()->count(); ?>)</span>
                             </li>
                         <?php endforeach;?>
+                            <li>
+                                <a href="<?= yii\helpers\Url::toRoute(['site/category', 'id'=>"all"]); ?>">Все</a>
+                            </li>
                         </ul>
                     </aside>
                 </div>
