@@ -62,20 +62,4 @@ class AuthController extends Controller
             return $this->redirect(['site/index']);
         }
     }
-    
-    public function actionTest()
-    {
-        $user = User::findOne(1);
-
-        Yii::$app->user->logout();
-        
-        if(Yii::$app->user->isGuest)
-        {
-            echo 'Пользователь гость';
-        }
-        else
-        {
-            echo 'Пользователь Авторизован';
-        }
-    }
 }
